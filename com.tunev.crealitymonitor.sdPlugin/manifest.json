@@ -1,0 +1,129 @@
+{
+	"$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+	"Name": "Creality Monitor",
+	"Version": "1.1.0.0",
+	"Author": "Tunev",
+	"Actions": [
+		{
+			"Name": "Print Status",
+			"UUID": "com.tunev.crealitymonitor.status",
+			"Icon": "imgs/actions/status/icon",
+			"Tooltip": "Shows the live state, progress and remaining time of a Creality K-series printer (K1 / K1C / K1 Max).",
+			"PropertyInspectorPath": "ui/status.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/status/key-idle",
+					"TitleAlignment": "bottom",
+					"FontSize": 13
+				},
+				{
+					"Image": "imgs/actions/status/key-printing",
+					"TitleAlignment": "bottom",
+					"FontSize": 13
+				},
+				{
+					"Image": "imgs/actions/status/key-paused",
+					"TitleAlignment": "bottom",
+					"FontSize": 13
+				},
+				{
+					"Image": "imgs/actions/status/key-complete",
+					"TitleAlignment": "bottom",
+					"FontSize": 13
+				},
+				{
+					"Image": "imgs/actions/status/key-error",
+					"TitleAlignment": "bottom",
+					"FontSize": 13
+				},
+				{
+					"Image": "imgs/actions/status/key-offline",
+					"TitleAlignment": "bottom",
+					"FontSize": 13
+				}
+			]
+		},
+		{
+			"Name": "Nozzle / Bed Temp",
+			"UUID": "com.tunev.crealitymonitor.temps",
+			"Icon": "imgs/actions/temps/icon",
+			"Tooltip": "Shows live nozzle and bed temperatures of a Creality K-series printer (K1 / K1C / K1 Max).",
+			"PropertyInspectorPath": "ui/temps.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/temps/key",
+					"TitleAlignment": "middle",
+					"FontSize": 14
+				}
+			]
+		},
+		{
+			"Name": "Fan Control",
+			"UUID": "com.tunev.crealitymonitor.fan",
+			"Icon": "imgs/actions/fan/icon",
+			"Tooltip": "Turns the Model, Back or Side fan of a Creality K-series printer on or off.",
+			"PropertyInspectorPath": "ui/fan.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/fan/key-off",
+					"TitleAlignment": "bottom",
+					"FontSize": 13
+				},
+				{
+					"Image": "imgs/actions/fan/key-on",
+					"TitleAlignment": "bottom",
+					"FontSize": 13
+				}
+			]
+		},
+		{
+			"Name": "Camera",
+			"UUID": "com.tunev.crealitymonitor.camera",
+			"Icon": "imgs/actions/camera/icon",
+			"Tooltip": "Shows a live WebRTC camera preview of a Creality K-series printer in the Property Inspector panel.",
+			"PropertyInspectorPath": "ui/camera.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/camera/key",
+					"TitleAlignment": "bottom",
+					"FontSize": 13
+				}
+			]
+		}
+	],
+	"Category": "Creality Monitor",
+	"CategoryIcon": "imgs/plugin/category-icon",
+	"CodePath": "bin/plugin.js",
+	"Description": "Live status, progress, temperature and camera monitoring for Creality K1 / K1C / K1 Max 3D printers, plus one-touch fan control, straight on your Stream Deck.",
+	"Icon": "imgs/plugin/marketplace",
+	"SDKVersion": 2,
+	"Software": {
+		"MinimumVersion": "7.1"
+	},
+	"OS": [
+		{
+			"Platform": "windows",
+			"MinimumVersion": "10"
+		},
+		{
+			"Platform": "mac",
+			"MinimumVersion": "12"
+		}
+	],
+	"Nodejs": {
+		"Version": "20"
+	},
+	"UUID": "com.tunev.crealitymonitor"
+}

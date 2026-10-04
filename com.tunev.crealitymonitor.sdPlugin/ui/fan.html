@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>Fan Control Settings</title>
+    <meta charset="utf-8" />
+    <script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+</head>
+
+<body>
+    <sdpi-item label="Printer IP / host">
+        <sdpi-textfield setting="host" placeholder="192.168.0.232"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item label="Port">
+        <sdpi-textfield setting="port" placeholder="9999"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item label="Fan">
+        <sdpi-select setting="fan" default="fan">
+            <option value="fan">Model Fan</option>
+            <option value="fanCase">Back Fan</option>
+            <option value="fanAuxilary">Side Fan</option>
+        </sdpi-select>
+    </sdpi-item>
+    <sdpi-item>
+        <small>Pressing the key toggles the selected fan on/off via the printer's local WebSocket API
+            ({"method":"set","params":{"&lt;fan&gt;":0|1}}). The key shows the fan's live speed percentage
+            (OFF when 0%). Works with Creality K1, K1C and K1 Max.</small>
+    </sdpi-item>
+</body>
+
+</html>

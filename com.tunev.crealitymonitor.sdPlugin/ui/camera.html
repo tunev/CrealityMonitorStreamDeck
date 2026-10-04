@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>Camera Settings</title>
+    <meta charset="utf-8" />
+    <script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        #camWrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #05070a;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        #cam {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        #camBadge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font: 11px sans-serif;
+            color: #cfd6de;
+            background: rgba(0, 0, 0, 0.55);
+        }
+
+        #camBadge.live {
+            color: #2ee36b;
+        }
+    </style>
+</head>
+
+<body>
+    <sdpi-item label="Printer IP / host">
+        <sdpi-textfield id="hostField" setting="host" placeholder="192.168.0.232"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item label="Port">
+        <sdpi-textfield id="portField" setting="port" placeholder="9999"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item label="This PC IP (camera)">
+        <sdpi-textfield id="pcAddressField" setting="pcAddress" placeholder="192.168.0.100"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item>
+        <small>Your computer's LAN IP, used to work around a Chromium mDNS/WebRTC quirk that otherwise prevents
+            the camera from connecting (same workaround as the Creality Monitor iCUE widget).</small>
+    </sdpi-item>
+
+    <div id="camWrap">
+        <video id="cam" autoplay muted playsinline></video>
+        <div id="camBadge">IDLE</div>
+    </div>
+
+    <script>
+        // Live WebRTC preview, shown only here in the Property Inspector (the physical
+        // Stream Deck key has no video codec). Mirrors the Creality Monitor iCUE widget's
+        // camera logic 1:1: request a one-time token over the status WebSocket, then POST
+        // a WebRTC offer to the printer's camera signalling port (8000) and play the answer.
+        var CAM_PORT = 8000;
+
+        var settings = { host: "", port: "9999", pcAddress: "" };
+        var statusWs = null;
+        var videoToken = null;
+        var cam = { pc: null, retry: null, watchdog: null, startedAt: 0 };
+
+        var camEl = document.getElementById("cam");
+        var badgeEl = document.getElementById("camBadge");
+
+        function setBadge(text, live) {
+            badgeEl.textContent = text;
+            badgeEl.className = live ? "live" : "";
+        }
+
+        function currentSettings() {
+            var host = (document.getElementById("hostField").value || "").trim() || "192.168.0.232";
+            var port = (document.getElementById("portField").value || "").trim() || "9999";
+            var pcAddress = (document.getElementById("pcAddressField").value || "").trim();
+            return { host: host, port: port, pcAddress: pcAddress };
+        }
+
+        function stopStatusSocket() {
+            if (statusWs) {
+                try { statusWs.onclose = null; statusWs.onerror = null; statusWs.close(); } catch (e) { /* ignore */ }
+                statusWs = null;
+            }
+        }
+
+        function requestVideoToken() {
+            if (statusWs && statusWs.readyState === 1) {
+                statusWs.send('{"method":"get","params":{"getToken":1}}');
+            }
+        }
+
+        function connectStatusSocket() {
+            stopStatusSocket();
+            var url = "ws://" + settings.host + ":" + settings.port + "/";
+            try {
+                statusWs = new WebSocket(url);
+            } catch (e) {
+                return;
+            }
+            statusWs.onopen = function () { requestVideoToken(); };
+            statusWs.onmessage = function (evt) {
+                if (!evt.data || evt.data.charAt(0) !== "{") return;
+                var msg;
+                try { msg = JSON.parse(evt.data); } catch (e) { return; }
+                if (msg && msg.videoToken) {
+                    videoToken = msg.videoToken;
+                    startCamera();
+                }
+            };
+            statusWs.onerror = function () { /* retried by the token re-request loop */ };
+        }
+
+        function stopCamera() {
+            if (cam.watchdog) { clearInterval(cam.watchdog); cam.watchdog = null; }
+            if (cam.retry) { clearTimeout(cam.retry); cam.retry = null; }
+            if (cam.pc) {
+                try {
+                    cam.pc.ontrack = null;
+                    cam.pc.oniceconnectionstatechange = null;
+                    cam.pc.close();
+                } catch (e) { /* ignore */ }
+                cam.pc = null;
+            }
+            camEl.srcObject = null;
+        }
+
+        function scheduleCameraRetry(reason) {
+            stopCamera();
+            setBadge(reason || "RECONNECTING", false);
+            cam.retry = setTimeout(function () { cam.retry = null; startCamera(); }, 5000);
+        }
+
+        function postOffer(pc) {
+            return new Promise(function (resolve, reject) {
+                // Chromium hides the local IP behind an mDNS name ("xxxx.local"), which the
+                // printer cannot resolve, so DTLS never completes. Replace it with the real IP.
+                var sdp = pc.localDescription.sdp;
+                if (settings.pcAddress) {
+                    sdp = sdp.replace(/[0-9a-fA-F-]{36}\.local/g, settings.pcAddress);
+                }
+                fetch("http://" + settings.host + ":" + CAM_PORT + "/call/webrtc_local", {
+                    method: "POST",
+                    headers: { "Content-Type": "plain/text" },
+                    body: btoa(JSON.stringify({ token: String(videoToken).trim(), sdp: sdp, type: "offer" }))
+                })
+                    .then(function (res) {
+                        if (!res.ok) throw new Error("HTTP " + res.status);
+                        return res.text();
+                    })
+                    .then(resolve, reject);
+            });
+        }
+
+        function waitForIce(pc) {
+            return new Promise(function (resolve) {
+                if (pc.iceGatheringState === "complete") { resolve(); return; }
+                var t = setTimeout(resolve, 2500);
+                pc.onicegatheringstatechange = function () {
+                    if (pc.iceGatheringState === "complete") { clearTimeout(t); resolve(); }
+                };
+            });
+        }
+
+        function startCamera() {
+            if (cam.pc) return;
+            if (!window.RTCPeerConnection) { setBadge("NO WEBRTC", false); return; }
+            if (!videoToken) { setBadge("WAITING TOKEN", false); requestVideoToken(); return; }
+
+            setBadge("CONNECTING", false);
+            var pc = new RTCPeerConnection({ iceServers: [] });
+            cam.pc = pc;
+            pc.addTransceiver("video", { direction: "recvonly" });
+
+            pc.ontrack = function (evt) {
+                camEl.srcObject = evt.streams[0];
+                var p = camEl.play();
+                if (p && p.catch) p.catch(function () { /* autoplay guard */ });
+            };
+
+            pc.oniceconnectionstatechange = function () {
+                var s = pc.iceConnectionState;
+                if (s === "failed" || s === "closed") scheduleCameraRetry("RECONNECTING");
+            };
+
+            cam.watchdog = setInterval(function () {
+                if (camEl.videoWidth > 0) {
+                    clearInterval(cam.watchdog); cam.watchdog = null;
+                    setBadge("LIVE", true);
+                    return;
+                }
+                if (Date.now() - cam.startedAt > 12000) {
+                    scheduleCameraRetry(settings.pcAddress ? "NO VIDEO" : "SET PC IP");
+                }
+            }, 1000);
+            cam.startedAt = Date.now();
+
+            pc.createOffer()
+                .then(function (offer) { return pc.setLocalDescription(offer); })
+                .then(function () { return waitForIce(pc); })
+                .then(function () { return postOffer(pc); })
+                .then(function (body) {
+                    var answer = JSON.parse(atob(body));
+                    if (!answer || !answer.sdp) throw new Error("bad answer");
+                    return pc.setRemoteDescription(new RTCSessionDescription(answer));
+                })
+                .catch(function (err) {
+                    videoToken = null; // token may have expired; fetch a fresh one before the next attempt
+                    requestVideoToken();
+                    scheduleCameraRetry("SIGNAL: " + (err && err.message ? err.message : "error"));
+                });
+        }
+
+        function restart() {
+            stopCamera();
+            stopStatusSocket();
+            videoToken = null;
+            settings = currentSettings();
+            setBadge("CONNECTING", false);
+            connectStatusSocket();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Give sdpi-components a moment to populate the fields from the saved settings.
+            setTimeout(restart, 500);
+            ["hostField", "portField", "pcAddressField"].forEach(function (id) {
+                document.getElementById(id).addEventListener("change", restart);
+            });
+        });
+
+        window.addEventListener("beforeunload", function () {
+            stopCamera();
+            stopStatusSocket();
+        });
+    </script>
+</body>
+
+</html>

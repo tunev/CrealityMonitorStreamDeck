@@ -1,0 +1,8 @@
+node_modules/
+com.tunev.crealitymonitor.sdPlugin/bin/
+com.tunev.crealitymonitor.sdPlugin/logs/
+com.tunev.crealitymonitor.sdPlugin/*.log
+*.streamDeckPlugin
+.DS_Store
+Thumbs.db
+Temp/

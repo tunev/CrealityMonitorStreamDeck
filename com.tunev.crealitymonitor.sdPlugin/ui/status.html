@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>Print Status Settings</title>
+    <meta charset="utf-8" />
+    <script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+</head>
+
+<body>
+    <sdpi-item label="Printer IP / host">
+        <sdpi-textfield setting="host" placeholder="192.168.0.232"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item label="Port">
+        <sdpi-textfield setting="port" placeholder="9999"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item>
+        <small>Leave both empty to use the defaults (192.168.0.232:9999). Works with Creality K1, K1C and K1 Max
+            over the printer's local WebSocket API &mdash; read-only, no print control.</small>
+    </sdpi-item>
+</body>
+
+</html>
