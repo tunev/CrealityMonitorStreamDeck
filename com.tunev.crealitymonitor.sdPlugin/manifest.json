@@ -108,10 +108,12 @@
 	"CodePath": "bin/plugin.js",
 	"Description": "Live status, progress, temperature and camera monitoring for Creality K1 / K1C / K1 Max 3D printers, plus one-touch fan control, straight on your Stream Deck.",
 	"Icon": "imgs/plugin/marketplace",
-	"SDKVersion": 2,
+	"SDKVersion": 3,
 	"Software": {
 		"MinimumVersion": "7.1"
 	},
+	"URL": "https://github.com/tunev/CrealityMonitorStreamDeck",
+	"SupportURL": "https://github.com/tunev/CrealityMonitorStreamDeck/issues",
 	"OS": [
 		{
 			"Platform": "windows",

@@ -75,21 +75,50 @@ def draw_printer_glyph(img: Image.Image, cx: float, cy: float, scale: float, col
     )
 
 
+def branded_card_icon(size: int) -> Image.Image:
+    """The full-color branded 'card' icon design (dark rounded square, printer glyph,
+    accent arc) shared by the manifest preferences icon and the Marketplace app icon —
+    they just differ in output pixel size."""
+    img = rounded_bg(size, radius_ratio=0.22)
+    draw_printer_glyph(img, size * 0.5, size * 0.46, size / 72, (232, 238, 245, 255))
+    draw = ImageDraw.Draw(img)
+    r = size * 0.33
+    bbox = [size / 2 - r, size / 2 - r, size / 2 + r, size / 2 + r]
+    draw.arc(bbox, start=200, end=340, fill=ACCENT, width=max(2, int(size * 0.02)))
+    return img
+
+
 def plugin_icons() -> None:
     plugin_dir = SD_PLUGIN / "imgs" / "plugin"
-    for size, suffix in ((288, ""), (512, "@2x")):
-        img = rounded_bg(size, radius_ratio=0.22)
-        draw_printer_glyph(img, size * 0.5, size * 0.46, size / 72, (232, 238, 245, 255))
-        draw = ImageDraw.Draw(img)
-        r = size * 0.33
-        bbox = [size / 2 - r, size / 2 - r, size / 2 + r, size / 2 + r]
-        draw.arc(bbox, start=200, end=340, fill=ACCENT, width=max(2, int(size * 0.02)))
-        img.save(plugin_dir / f"marketplace{suffix}.png")
 
+    # Manifest "Icon" (Stream Deck preferences pane) — must be 256x256 / 512x512.
+    for size, suffix in ((256, ""), (512, "@2x")):
+        branded_card_icon(size).save(plugin_dir / f"marketplace{suffix}.png")
+
+    # Marketplace "App Icon" (Maker Console product listing) — must be exactly 288x288,
+    # single size, not bundled inside the plugin itself.
+    marketing_dir = ROOT / "marketing"
+    marketing_dir.mkdir(exist_ok=True)
+    branded_card_icon(288).save(marketing_dir / "app-icon-288.png")
+
+    # Category icon must be monochrome white on a transparent background (Marketplace
+    # guideline), unlike the full-color branded app icon above.
     for size, suffix in ((28, ""), (56, "@2x")):
-        img = rounded_bg(size, radius_ratio=0.25)
-        draw_printer_glyph(img, size * 0.5, size * 0.52, size / 72, (232, 238, 245, 255))
+        img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        draw_printer_glyph(img, size * 0.5, size * 0.52, size / 72, (255, 255, 255, 255))
         img.save(plugin_dir / f"category-icon{suffix}.png")
+
+
+def draw_thermometer_glyph(img: Image.Image, cx: float, cy: float, scale: float, color) -> None:
+    """Draws a single flat thermometer glyph (stem + bulb) centered at (cx, cy), for the
+    action-list icon — distinct silhouette from the two-color key icon."""
+    draw = ImageDraw.Draw(img)
+    stem_w = 6 * scale
+    bulb_r = 8 * scale
+    top = cy - 15 * scale
+    bot = cy + 6 * scale
+    draw.rounded_rectangle([cx - stem_w / 2, top, cx + stem_w / 2, bot], radius=stem_w / 2, fill=color)
+    draw.ellipse([cx - bulb_r, bot - bulb_r * 0.5, cx + bulb_r, bot + bulb_r * 1.5], fill=color)
 
 
 def draw_fan_glyph(img: Image.Image, cx: float, cy: float, scale: float, color) -> None:
@@ -122,17 +151,13 @@ def draw_camera_glyph(img: Image.Image, cx: float, cy: float, scale: float, colo
     )
 
 
-def action_list_icon(folder: str, accent, glyph=draw_printer_glyph) -> None:
+def action_list_icon(folder: str, glyph=draw_printer_glyph) -> None:
+    """Action-list icon: monochrome white glyph on a transparent background, per
+    Marketplace guidelines (no color, no solid background)."""
     out_dir = SD_PLUGIN / "imgs" / "actions" / folder
     for size, suffix in ((20, ""), (40, "@2x")):
         img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-        glyph(img, size * 0.5, size * 0.5, size / 40, (232, 238, 245, 255))
-        draw = ImageDraw.Draw(img)
-        dot_r = size * 0.09
-        draw.ellipse(
-            [size * 0.72 - dot_r, size * 0.72 - dot_r, size * 0.72 + dot_r, size * 0.72 + dot_r],
-            fill=accent,
-        )
+        glyph(img, size * 0.5, size * 0.5, size / 40, (255, 255, 255, 255))
         img.save(out_dir / f"icon{suffix}.png")
 
 
@@ -202,10 +227,10 @@ def camera_key() -> None:
 
 def main() -> None:
     plugin_icons()
-    action_list_icon("status", ACCENT)
-    action_list_icon("temps", (255, 138, 61, 255))
-    action_list_icon("fan", ACCENT, draw_fan_glyph)
-    action_list_icon("camera", (170, 120, 255, 255), draw_camera_glyph)
+    action_list_icon("status")
+    action_list_icon("temps", draw_thermometer_glyph)
+    action_list_icon("fan", draw_fan_glyph)
+    action_list_icon("camera", draw_camera_glyph)
 
     status_key("idle", OFFLINE)
     status_key("printing", ACCENT)
