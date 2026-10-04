@@ -1,5 +1,10 @@
 # Creality Monitor — Stream Deck plugin
 
+![Creality Monitor thumbnail](Media/Screenshot1.png)
+![Creality Monitor — complete state](Media/Screenshot1.png)
+![Creality Monitor — photo1](Media/20261004_125303.jpg)
+![Creality Monitor — photo1](Media/20261004_124535.jpg)
+
 Live print status, temperatures, fan control and camera preview for a **Creality K-series
 printer** (K1 / K1C / K1 Max), straight on your Stream Deck.
 
