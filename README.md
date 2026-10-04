@@ -3,7 +3,7 @@
 Live print status, temperatures, fan control and camera preview for a **Creality K-series
 printer** (K1 / K1C / K1 Max), straight on your Stream Deck.
 
-Sibling project to [`CrealityCorsairWidget`](../creality-monitor-icue) (the Corsair iCUE
+Sibling project to [`CrealityCorsairWidget`](https://github.com/tunev/creality-monitor-icue) (the Corsair iCUE
 widget version of the same monitor) — both talk to the printer's local API on port `9999`
 using the same connection/merge logic, so behavior should feel consistent across both.
 
