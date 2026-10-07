@@ -192,6 +192,40 @@ def temps_key() -> None:
         img.save(out_dir / f"key{suffix}.png")
 
 
+def nozzle_key() -> None:
+    out_dir = SD_PLUGIN / "imgs" / "actions" / "nozzle"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for size, suffix in ((72, ""), (144, "@2x")):
+        img = rounded_bg(size, radius_ratio=0.18)
+        draw = ImageDraw.Draw(img)
+        bulb_r = size * 0.09
+        stem_w = size * 0.07
+        cx = size * 0.5
+        top = size * 0.18
+        bot = size * 0.55
+        color = (255, 138, 61, 255)  # Orange for nozzle
+        draw.rounded_rectangle([cx - stem_w / 2, top, cx + stem_w / 2, bot], radius=stem_w / 2, fill=color)
+        draw.ellipse([cx - bulb_r, bot - bulb_r * 0.6, cx + bulb_r, bot + bulb_r * 1.4], fill=color)
+        img.save(out_dir / f"key{suffix}.png")
+
+
+def bed_key() -> None:
+    out_dir = SD_PLUGIN / "imgs" / "actions" / "bed"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for size, suffix in ((72, ""), (144, "@2x")):
+        img = rounded_bg(size, radius_ratio=0.18)
+        draw = ImageDraw.Draw(img)
+        bulb_r = size * 0.09
+        stem_w = size * 0.07
+        cx = size * 0.5
+        top = size * 0.18
+        bot = size * 0.55
+        color = (255, 77, 109, 255)  # Pink for bed
+        draw.rounded_rectangle([cx - stem_w / 2, top, cx + stem_w / 2, bot], radius=stem_w / 2, fill=color)
+        draw.ellipse([cx - bulb_r, bot - bulb_r * 0.6, cx + bulb_r, bot + bulb_r * 1.4], fill=color)
+        img.save(out_dir / f"key{suffix}.png")
+
+
 def fan_key(state: str, accent) -> None:
     out_dir = SD_PLUGIN / "imgs" / "actions" / "fan"
     glyph_color = (232, 238, 245, 255) if state == "on" else (140, 148, 158, 255)
@@ -229,6 +263,8 @@ def main() -> None:
     plugin_icons()
     action_list_icon("status")
     action_list_icon("temps", draw_thermometer_glyph)
+    action_list_icon("nozzle", draw_thermometer_glyph)
+    action_list_icon("bed", draw_thermometer_glyph)
     action_list_icon("fan", draw_fan_glyph)
     action_list_icon("camera", draw_camera_glyph)
 
@@ -240,6 +276,8 @@ def main() -> None:
     status_key("offline", OFFLINE)
 
     temps_key()
+    nozzle_key()
+    bed_key()
 
     fan_key("off", OK)
     fan_key("on", OK)

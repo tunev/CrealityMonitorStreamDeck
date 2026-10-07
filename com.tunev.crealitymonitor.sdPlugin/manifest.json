@@ -47,19 +47,36 @@
 			]
 		},
 		{
-			"Name": "Nozzle / Bed Temp",
-			"UUID": "com.tunev.crealitymonitor.temps",
-			"Icon": "imgs/actions/temps/icon",
-			"Tooltip": "Shows live nozzle and bed temperatures of a Creality K-series printer (K1 / K1C / K1 Max).",
-			"PropertyInspectorPath": "ui/temps.html",
+			"Name": "Nozzle Temp",
+			"UUID": "com.tunev.crealitymonitor.nozzle",
+			"Icon": "imgs/actions/nozzle/icon",
+			"Tooltip": "Shows live nozzle temperature (current and target) of a Creality K-series printer (K1 / K1C / K1 Max).",
+			"PropertyInspectorPath": "ui/nozzle.html",
 			"Controllers": [
 				"Keypad"
 			],
 			"States": [
 				{
-					"Image": "imgs/actions/temps/key",
+					"Image": "imgs/actions/nozzle/key",
 					"TitleAlignment": "middle",
-					"FontSize": 14
+					"FontSize": 13
+				}
+			]
+		},
+		{
+			"Name": "Bed Temp",
+			"UUID": "com.tunev.crealitymonitor.bed",
+			"Icon": "imgs/actions/bed/icon",
+			"Tooltip": "Shows live bed temperature (current and target) of a Creality K-series printer (K1 / K1C / K1 Max).",
+			"PropertyInspectorPath": "ui/bed.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/bed/key",
+					"TitleAlignment": "middle",
+					"FontSize": 13
 				}
 			]
 		},

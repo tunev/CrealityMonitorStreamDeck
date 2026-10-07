@@ -104,9 +104,18 @@ export class PrintStatus extends SingletonAction<StatusSettings> {
 		const isPrinting = num(data, "state", -1) === 1;
 		const left = num(data, "printLeftTime", -1);
 
-		const lines = [status.text];
-		lines.push(totalLayer > 0 ? `${Math.round(pct)}%  L${layer}/${totalLayer}` : `${Math.round(pct)}%`);
-		if (isPrinting && left > 0) lines.push(fmtTime(left));
+		// 3-line layout for better readability on Stream Deck XL
+		const lines = [String(Math.round(pct)) + "%"];
+		if (totalLayer > 0) {
+			lines.push(`L${layer}/${totalLayer}`);
+		} else {
+			lines.push("-");
+		}
+		if (isPrinting && left > 0) {
+			lines.push(fmtTime(left));
+		} else {
+			lines.push(status.text);
+		}
 
 		await action.setTitle(lines.join("\n"));
 		await action.setState(STATE_INDEX[status.code]);
