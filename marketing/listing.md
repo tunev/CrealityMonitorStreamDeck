@@ -12,23 +12,9 @@ Creality Monitor
 
 ## Description (for Maker Console, English, 250–1500 chars)
 
-Monitor and control your Creality K1, K1C, or K1 Max 3D printer directly from
-your Stream Deck. Creality Monitor connects to the printer's local network API
-to show live print status, progress, remaining time, and nozzle/bed
-temperature right on your keys — no cloud account, app switching, or extra
-hardware required.
+Monitor and control your Creality K1, K1C, or K1 Max 3D printer directly from your Stream Deck. Live print status shows whether your printer is idle, printing, paused, completed or offline. See real-time nozzle and bed temperatures, current layer and remaining time. Turn the Model, Back (Case) or Side (Auxiliary) cooling fan on or off with a single key press, and watch the live fan speed percentage update (0–100%). Open the Camera action's property inspector for a live WebRTC video stream of your printer's built-in camera, so you can monitor your print in real time.
 
-Turn the Model, Back, or Side cooling fan on or off with a single press, and
-see its live speed percentage right on the key. Open the Camera action's
-property inspector for a live video preview of your print, powered by the
-printer's built-in camera stream.
-
-Every action can be pointed at a different printer IP address, so the plugin
-also works well if you own more than one Creality K-series printer. Requires
-the printer and your Stream Deck computer to be on the same local network.
-
-(≈830 characters — within the 250–1500 limit, keyword-rich in the first 250
-chars: "Creality", "K1", "K1C", "K1 Max", "3D printer", "Stream Deck".)
+Every action can point to a different printer IP address, supporting multiple Creality K-series machines. Requires local network (LAN) access to port 9999 — no cloud account, app switching, or extra hardware needed. Simple, fast, reliable monitoring and control at a glance.
 
 ## Tags / supported devices
 

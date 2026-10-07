@@ -137,8 +137,8 @@ class PrinterClient {
 			try {
 				this.ws.removeAllListeners();
 				this.ws.close();
-			} catch {
-				/* ignore */
+			} catch (err) {
+				streamDeck.logger.debug(`[PrinterClient ${this.host}:${this.port}] close error during dispose: ${(err as Error).message}`);
 			}
 			this.ws = null;
 		}
@@ -162,8 +162,9 @@ class PrinterClient {
 	private scheduleReconnect(reason: string): void {
 		this.online = false;
 		this.emit();
+		if (this.closed) return; // Don't try to reconnect if we're disposing
 		streamDeck.logger.debug(`[PrinterClient ${this.host}:${this.port}] ${reason}`);
-		if (this.reconnectTimer || this.closed) return;
+		if (this.reconnectTimer) return;
 		this.reconnectTimer = setTimeout(() => {
 			this.reconnectTimer = null;
 			this.connect();
@@ -226,8 +227,20 @@ class PrinterClient {
 			this.emit();
 		});
 
-		socket.on("error", (err) => this.scheduleReconnect(`connection error: ${err.message}`));
-		socket.on("close", () => this.scheduleReconnect("disconnected"));
+		socket.on("error", (err) => {
+			try {
+				this.scheduleReconnect(`connection error: ${err.message}`);
+			} catch (e) {
+				streamDeck.logger.error(`[PrinterClient ${this.host}:${this.port}] error handler crashed: ${(e as Error).message}`);
+			}
+		});
+		socket.on("close", () => {
+			try {
+				this.scheduleReconnect("disconnected");
+			} catch (e) {
+				streamDeck.logger.error(`[PrinterClient ${this.host}:${this.port}] close handler crashed: ${(e as Error).message}`);
+			}
+		});
 	}
 }
 

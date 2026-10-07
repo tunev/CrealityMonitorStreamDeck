@@ -106,7 +106,7 @@
 	"Category": "Creality Monitor",
 	"CategoryIcon": "imgs/plugin/category-icon",
 	"CodePath": "bin/plugin.js",
-	"Description": "Live status, progress, temperature and camera monitoring for Creality K1 / K1C / K1 Max 3D printers, plus one-touch fan control, straight on your Stream Deck.",
+	"Description": "Live print status, temperature, cooling fan control and camera preview for Creality K1/K1C/K1 Max 3D printers. Monitor your printer directly on your Stream Deck and turn fans on/off with a single key press. Requires local network access to the printer (port 9999).",
 	"Icon": "imgs/plugin/marketplace",
 	"SDKVersion": 3,
 	"Software": {
