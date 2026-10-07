@@ -25,16 +25,15 @@ export type PrinterListener = (data: PrinterState, online: boolean) => void;
 
 /**
  * Fan command keys, per the reverse-engineered K-series WebSocket protocol
- * (https://github.com/qtqgyt/Creality-K1-Websocket-Docs): each is both the
- * telemetry field reporting on/off state and the `params` key accepted by
- * `{"method":"set","params":{...}}` to toggle it.
+ * (https://github.com/qtqgyt/Creality-K1-Websocket-Docs). Note: "auxiliary"
+ * is spelled with double-L in the actual protocol (`fanAuxiliary`).
  */
-export type FanKey = "fan" | "fanCase" | "fanAuxilary";
+export type FanKey = "fan" | "fanCase" | "fanAuxiliary";
 
 export const FAN_LABELS: Record<FanKey, string> = {
 	fan: "Model Fan",
 	fanCase: "Back Fan",
-	fanAuxilary: "Side Fan"
+	fanAuxiliary: "Side Fan"
 };
 
 /**
@@ -48,7 +47,7 @@ export const FAN_LABELS: Record<FanKey, string> = {
 export const FAN_READ_FIELD: Record<FanKey, string> = {
 	fan: "modelFanPct",
 	fanCase: "caseFanPct",
-	fanAuxilary: "auxiliaryFanPct"
+	fanAuxiliary: "auxiliaryFanPct"
 };
 
 const HEARTBEAT_INTERVAL_MS = 5000;
