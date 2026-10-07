@@ -89,7 +89,7 @@ export class PrintStatus extends SingletonAction<StatusSettings> {
 	}
 
 	private async render(action: WillAppearEvent<StatusSettings>["action"], data: PrinterState, online: boolean): Promise<void> {
-		if (!action.isKey()) return; // this action only declares a Keypad controller
+		if (!action.isKey()) return;
 
 		if (!online) {
 			await action.setTitle("OFFLINE");
@@ -104,18 +104,10 @@ export class PrintStatus extends SingletonAction<StatusSettings> {
 		const isPrinting = num(data, "state", -1) === 1;
 		const left = num(data, "printLeftTime", -1);
 
-		// 3-line layout for better readability on Stream Deck XL
+		// 3-line layout: %, Layer, Time
 		const lines = [String(Math.round(pct)) + "%"];
-		if (totalLayer > 0) {
-			lines.push(`L${layer}/${totalLayer}`);
-		} else {
-			lines.push("-");
-		}
-		if (isPrinting && left > 0) {
-			lines.push(fmtTime(left));
-		} else {
-			lines.push(status.text);
-		}
+		lines.push(totalLayer > 0 ? `L${layer}/${totalLayer}` : "-");
+		lines.push(isPrinting && left > 0 ? fmtTime(left) : status.text);
 
 		await action.setTitle(lines.join("\n"));
 		await action.setState(STATE_INDEX[status.code]);
