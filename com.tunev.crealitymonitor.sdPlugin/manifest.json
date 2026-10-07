@@ -17,32 +17,32 @@
 				{
 					"Image": "imgs/actions/status/key-idle",
 					"TitleAlignment": "bottom",
-					"FontSize": 13
+					"FontSize": 11
 				},
 				{
 					"Image": "imgs/actions/status/key-printing",
 					"TitleAlignment": "bottom",
-					"FontSize": 13
+					"FontSize": 11
 				},
 				{
 					"Image": "imgs/actions/status/key-paused",
 					"TitleAlignment": "bottom",
-					"FontSize": 13
+					"FontSize": 11
 				},
 				{
 					"Image": "imgs/actions/status/key-complete",
 					"TitleAlignment": "bottom",
-					"FontSize": 13
+					"FontSize": 11
 				},
 				{
 					"Image": "imgs/actions/status/key-error",
 					"TitleAlignment": "bottom",
-					"FontSize": 13
+					"FontSize": 11
 				},
 				{
 					"Image": "imgs/actions/status/key-offline",
 					"TitleAlignment": "bottom",
-					"FontSize": 13
+					"FontSize": 11
 				}
 			]
 		},
@@ -58,8 +58,8 @@
 			"States": [
 				{
 					"Image": "imgs/actions/nozzle/key",
-					"TitleAlignment": "middle",
-					"FontSize": 13
+					"TitleAlignment": "bottom",
+					"FontSize": 11
 				}
 			]
 		},
@@ -75,8 +75,8 @@
 			"States": [
 				{
 					"Image": "imgs/actions/bed/key",
-					"TitleAlignment": "middle",
-					"FontSize": 13
+					"TitleAlignment": "bottom",
+					"FontSize": 11
 				}
 			]
 		},
