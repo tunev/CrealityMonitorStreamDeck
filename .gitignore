@@ -7,3 +7,4 @@ com.tunev.crealitymonitor.sdPlugin/*.log
 Thumbs.db
 Temp/
 marketing/
+__pycache__/
