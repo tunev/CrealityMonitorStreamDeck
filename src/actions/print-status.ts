@@ -31,6 +31,12 @@ function fmtTime(totalSeconds: number): string {
 	return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
 }
 
+function shortLabel(status: ReturnType<typeof describeState>): string {
+	if (status.code === "complete") return "DONE";
+	if (status.code === "error") return status.text.replace("ERROR ", "ERR ");
+	return status.text;
+}
+
 function resolveSettings(settings: StatusSettings): { host: string; port: string } {
 	return {
 		host: settings.host?.trim() || DEFAULT_HOST,
@@ -104,10 +110,17 @@ export class PrintStatus extends SingletonAction<StatusSettings> {
 		const isPrinting = num(data, "state", -1) === 1;
 		const left = num(data, "printLeftTime", -1);
 
-		// 3-line layout: %, Layer, Time
-		const lines = [String(Math.round(pct)) + "%"];
-		lines.push(totalLayer > 0 ? `L${layer}/${totalLayer}` : "-");
-		lines.push(isPrinting && left > 0 ? fmtTime(left) : status.text);
+		const pctText = `${Math.round(pct)}%`;
+		let lines: string[];
+		if (isPrinting) {
+			// progress, layer and remaining time
+			lines = [pctText];
+			if (totalLayer > 0) lines.push(`L${layer}/${totalLayer}`);
+			if (left > 0) lines.push(fmtTime(left));
+		} else {
+			// short label so it fits the key width (e.g. "COMPLETE" gets clipped)
+			lines = [shortLabel(status), pctText];
+		}
 
 		await action.setTitle(lines.join("\n"));
 		await action.setState(STATE_INDEX[status.code]);

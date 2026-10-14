@@ -74,10 +74,7 @@ export class NozzleTemp extends SingletonAction<NozzleTempSettings> {
 		const nozzleCur = Math.round(num(data, "nozzleTemp"));
 		const nozzleTgt = Math.round(num(data, "targetNozzleTemp"));
 
-		const lines = ["Nozzle", `${nozzleCur}\u00B0`];
-		if (nozzleTgt > 0) {
-			lines.push(`→${nozzleTgt}\u00B0`);
-		}
+		const lines = ["Nozzle", nozzleTgt > 0 ? `${nozzleCur}\u00B0\u2192${nozzleTgt}\u00B0` : `${nozzleCur}\u00B0`];
 
 		await action.setTitle(lines.join("\n"));
 	}

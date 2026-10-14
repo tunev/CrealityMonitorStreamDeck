@@ -74,10 +74,7 @@ export class BedTemp extends SingletonAction<BedTempSettings> {
 		const bedCur = Math.round(num(data, "bedTemp0"));
 		const bedTgt = Math.round(num(data, "targetBedTemp0"));
 
-		const lines = ["Bed", `${bedCur}\u00B0`];
-		if (bedTgt > 0) {
-			lines.push(`→${bedTgt}\u00B0`);
-		}
+		const lines = ["Bed", bedTgt > 0 ? `${bedCur}\u00B0\u2192${bedTgt}\u00B0` : `${bedCur}\u00B0`];
 
 		await action.setTitle(lines.join("\n"));
 	}

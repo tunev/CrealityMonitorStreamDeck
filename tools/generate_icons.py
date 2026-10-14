@@ -161,19 +161,60 @@ def action_list_icon(folder: str, glyph=draw_printer_glyph) -> None:
         img.save(out_dir / f"icon{suffix}.png")
 
 
+def draw_bar(img: Image.Image, size: int, color) -> None:
+    bar_h = size * 0.07
+    ImageDraw.Draw(img).rounded_rectangle(
+        [size * 0.12, size - bar_h - size * 0.1, size * 0.88, size - size * 0.1],
+        radius=bar_h / 2,
+        fill=color,
+    )
+
+
+def status_key_image(size: int, accent) -> Image.Image:
+    # Glyph is small and high so a 3-line title (progress / layer / time) fits below it.
+    img = rounded_bg(size, radius_ratio=0.18)
+    draw_printer_glyph(img, size * 0.5, size * 0.25, size / 125, (232, 238, 245, 255))
+    draw_bar(img, size, accent)
+    return img
+
+
+def thermo_key_image(size: int, color) -> Image.Image:
+    # Thermometer sits high so the 2-line title (label + temperature) never overlaps it.
+    img = rounded_bg(size, radius_ratio=0.18)
+    draw = ImageDraw.Draw(img)
+    bulb_r = size * 0.09
+    stem_w = size * 0.07
+    cx = size * 0.5
+    top = size * 0.12
+    bot = size * 0.40
+    draw.rounded_rectangle([cx - stem_w / 2, top, cx + stem_w / 2, bot], radius=stem_w / 2, fill=color)
+    draw.ellipse([cx - bulb_r, bot - bulb_r * 0.6, cx + bulb_r, bot + bulb_r * 1.4], fill=color)
+    return img
+
+
+def fan_key_image(size: int, state: str, accent) -> Image.Image:
+    glyph_color = (232, 238, 245, 255) if state == "on" else (140, 148, 158, 255)
+    bar_color = accent if state == "on" else OFFLINE
+    img = rounded_bg(size, radius_ratio=0.18)
+    draw_fan_glyph(img, size * 0.5, size * 0.38, size / 100, glyph_color)
+    draw_bar(img, size, bar_color)
+    return img
+
+
+CAMERA_ACCENT = (170, 120, 255, 255)
+
+
+def camera_key_image(size: int) -> Image.Image:
+    img = rounded_bg(size, radius_ratio=0.18)
+    draw_camera_glyph(img, size * 0.5, size * 0.4, size / 100, (232, 238, 245, 255))
+    draw_bar(img, size, CAMERA_ACCENT)
+    return img
+
+
 def status_key(state_code: str, accent) -> None:
     out_dir = SD_PLUGIN / "imgs" / "actions" / "status"
     for size, suffix in ((72, ""), (144, "@2x")):
-        img = rounded_bg(size, radius_ratio=0.18)
-        draw_printer_glyph(img, size * 0.5, size * 0.38, size / 100, (232, 238, 245, 255))
-        draw = ImageDraw.Draw(img)
-        bar_h = size * 0.07
-        draw.rounded_rectangle(
-            [size * 0.12, size - bar_h - size * 0.1, size * 0.88, size - size * 0.1],
-            radius=bar_h / 2,
-            fill=accent,
-        )
-        img.save(out_dir / f"key-{state_code}{suffix}.png")
+        status_key_image(size, accent).save(out_dir / f"key-{state_code}{suffix}.png")
 
 
 def temps_key() -> None:
@@ -192,71 +233,34 @@ def temps_key() -> None:
         img.save(out_dir / f"key{suffix}.png")
 
 
+NOZZLE_COLOR = (255, 138, 61, 255)
+BED_COLOR = (255, 77, 109, 255)
+
+
 def nozzle_key() -> None:
     out_dir = SD_PLUGIN / "imgs" / "actions" / "nozzle"
     out_dir.mkdir(parents=True, exist_ok=True)
     for size, suffix in ((72, ""), (144, "@2x")):
-        img = rounded_bg(size, radius_ratio=0.18)
-        draw = ImageDraw.Draw(img)
-        bulb_r = size * 0.09
-        stem_w = size * 0.07
-        cx = size * 0.5
-        top = size * 0.18
-        bot = size * 0.55
-        color = (255, 138, 61, 255)  # Orange for nozzle
-        draw.rounded_rectangle([cx - stem_w / 2, top, cx + stem_w / 2, bot], radius=stem_w / 2, fill=color)
-        draw.ellipse([cx - bulb_r, bot - bulb_r * 0.6, cx + bulb_r, bot + bulb_r * 1.4], fill=color)
-        img.save(out_dir / f"key{suffix}.png")
+        thermo_key_image(size, NOZZLE_COLOR).save(out_dir / f"key{suffix}.png")
 
 
 def bed_key() -> None:
     out_dir = SD_PLUGIN / "imgs" / "actions" / "bed"
     out_dir.mkdir(parents=True, exist_ok=True)
     for size, suffix in ((72, ""), (144, "@2x")):
-        img = rounded_bg(size, radius_ratio=0.18)
-        draw = ImageDraw.Draw(img)
-        bulb_r = size * 0.09
-        stem_w = size * 0.07
-        cx = size * 0.5
-        top = size * 0.18
-        bot = size * 0.55
-        color = (255, 77, 109, 255)  # Pink for bed
-        draw.rounded_rectangle([cx - stem_w / 2, top, cx + stem_w / 2, bot], radius=stem_w / 2, fill=color)
-        draw.ellipse([cx - bulb_r, bot - bulb_r * 0.6, cx + bulb_r, bot + bulb_r * 1.4], fill=color)
-        img.save(out_dir / f"key{suffix}.png")
+        thermo_key_image(size, BED_COLOR).save(out_dir / f"key{suffix}.png")
 
 
 def fan_key(state: str, accent) -> None:
     out_dir = SD_PLUGIN / "imgs" / "actions" / "fan"
-    glyph_color = (232, 238, 245, 255) if state == "on" else (140, 148, 158, 255)
-    bar_color = accent if state == "on" else OFFLINE
     for size, suffix in ((72, ""), (144, "@2x")):
-        img = rounded_bg(size, radius_ratio=0.18)
-        draw_fan_glyph(img, size * 0.5, size * 0.38, size / 100, glyph_color)
-        draw = ImageDraw.Draw(img)
-        bar_h = size * 0.07
-        draw.rounded_rectangle(
-            [size * 0.12, size - bar_h - size * 0.1, size * 0.88, size - size * 0.1],
-            radius=bar_h / 2,
-            fill=bar_color,
-        )
-        img.save(out_dir / f"key-{state}{suffix}.png")
+        fan_key_image(size, state, accent).save(out_dir / f"key-{state}{suffix}.png")
 
 
 def camera_key() -> None:
     out_dir = SD_PLUGIN / "imgs" / "actions" / "camera"
-    accent = (170, 120, 255, 255)
     for size, suffix in ((72, ""), (144, "@2x")):
-        img = rounded_bg(size, radius_ratio=0.18)
-        draw_camera_glyph(img, size * 0.5, size * 0.4, size / 100, (232, 238, 245, 255))
-        draw = ImageDraw.Draw(img)
-        bar_h = size * 0.07
-        draw.rounded_rectangle(
-            [size * 0.12, size - bar_h - size * 0.1, size * 0.88, size - size * 0.1],
-            radius=bar_h / 2,
-            fill=accent,
-        )
-        img.save(out_dir / f"key{suffix}.png")
+        camera_key_image(size).save(out_dir / f"key{suffix}.png")
 
 
 def main() -> None:
