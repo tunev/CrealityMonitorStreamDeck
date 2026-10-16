@@ -61,13 +61,17 @@ export interface PrinterStatus {
 	code: "idle" | "printing" | "paused" | "complete" | "error";
 }
 
+// Confirmed on a real K1C: 5 = paused, 4 = stopped; 6 / 7 / 9 are the short transitions in between.
 const STATE_TEXT: Record<number, PrinterStatus> = {
 	0: { text: "IDLE", code: "idle" },
 	1: { text: "PRINTING", code: "printing" },
 	2: { text: "COMPLETE", code: "complete" },
 	3: { text: "FAILED", code: "error" },
-	4: { text: "PAUSED", code: "paused" },
-	5: { text: "STOPPED", code: "paused" }
+	4: { text: "STOPPED", code: "paused" },
+	5: { text: "PAUSED", code: "paused" },
+	6: { text: "PAUSING", code: "paused" },
+	7: { text: "STOPPING", code: "paused" },
+	9: { text: "STARTING", code: "idle" }
 };
 
 /** Safely reads a numeric field from the loosely-typed printer state object. */

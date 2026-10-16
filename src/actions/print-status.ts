@@ -34,6 +34,8 @@ function fmtTime(totalSeconds: number): string {
 function shortLabel(status: ReturnType<typeof describeState>): string {
 	if (status.code === "complete") return "DONE";
 	if (status.code === "error") return status.text.replace("ERROR ", "ERR ");
+	if (status.text === "STOPPING") return "STOP";
+	if (status.text === "STARTING") return "START";
 	return status.text;
 }
 
