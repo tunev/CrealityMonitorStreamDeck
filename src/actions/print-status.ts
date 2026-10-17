@@ -36,6 +36,7 @@ function shortLabel(status: ReturnType<typeof describeState>): string {
 	if (status.code === "error") return status.text.replace("ERROR ", "ERR ");
 	if (status.text === "STOPPING") return "STOP";
 	if (status.text === "STARTING") return "START";
+	if (status.text === "RESUMING") return "RESUME";
 	return status.text;
 }
 

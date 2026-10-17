@@ -71,6 +71,7 @@ const STATE_TEXT: Record<number, PrinterStatus> = {
 	5: { text: "PAUSED", code: "paused" },
 	6: { text: "PAUSING", code: "paused" },
 	7: { text: "STOPPING", code: "paused" },
+	8: { text: "RESUMING", code: "printing" },
 	9: { text: "STARTING", code: "idle" }
 };
 
